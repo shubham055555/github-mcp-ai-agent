@@ -19,6 +19,11 @@ The project also includes a deterministic local evaluation system for testing MC
 
 ## Architecture
 
+The GitHub MCP AI Agent follows a layered architecture where the AI agent uses MCP tools to interact with GitHub through a dedicated MCP server.
+
+![GitHub MCP AI Agent Architecture](docs/architecture.png)
+
+
 ```text
                          User
                           |
