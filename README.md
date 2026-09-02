@@ -482,3 +482,14 @@ Project Documentation           Completed
 ## License
 
 This project is intended for learning, experimentation, and open-source development.
+
+## Demo
+
+The agent can understand natural-language GitHub requests and automatically select and execute the appropriate MCP tool.
+
+### Example 1: List Open Issues
+
+User request:
+
+```text
+Show me all open issues in QueryMind
