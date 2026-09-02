@@ -1,764 +1,479 @@
-\# GitHub MCP AI Agent
+# GitHub MCP AI Agent
 
+An AI-powered GitHub assistant built with Python, Model Context Protocol (MCP), GitHub REST API, and Google Gemini.
 
+This project demonstrates how an AI agent can interact with GitHub repositories and issues through MCP tools. The AI model does not directly access the GitHub API. Instead, GitHub operations are exposed through an MCP server and accessed by the AI agent through an MCP client.
 
-An AI-powered GitHub assistant built using the Model Context Protocol (MCP), GitHub REST API, Python, and Google Gemini.
+## Overview
 
+The system provides an AI-driven interface for performing GitHub operations such as:
 
+* Listing repositories
+* Listing repository issues
+* Filtering issues by state
+* Searching issues
+* Retrieving individual issues
+* Executing multi-step tool workflows
 
-The project allows an AI agent to interact with GitHub repositories and issues through MCP tools instead of directly coupling the AI model with the GitHub API.
+The project also includes a deterministic local evaluation system for testing MCP tools without consuming AI API quota.
 
-
-
-\## Features
-
-
-
-\* GitHub API authentication using Personal Access Token
-
-\* MCP-based GitHub server
-
-\* Gemini-powered AI agent
-
-\* Four GitHub MCP tools
-
-\* Repository and issue search
-
-\* Open, closed, and all issue filtering
-
-\* Individual GitHub issue retrieval
-
-\* Multi-step AI tool execution
-
-\* Deterministic local evaluation
-
-\* 20/20 MCP evaluation tests passed
-
-
-
-\## Architecture
-
-
+## Architecture
 
 ```text
-
-&#x20;                   User Query
-
-&#x20;                       |
-
-&#x20;                       v
-
-&#x20;               +----------------+
-
-&#x20;               |  Gemini Agent  |
-
-&#x20;               |  ai\_client.py  |
-
-&#x20;               +-------+--------+
-
-&#x20;                       |
-
-&#x20;                       v
-
-&#x20;               +----------------+
-
-&#x20;               |   MCP Client   |
-
-&#x20;               |   client.py    |
-
-&#x20;               +-------+--------+
-
-&#x20;                       |
-
-&#x20;                 STDIO Transport
-
-&#x20;                       |
-
-&#x20;                       v
-
-&#x20;               +----------------+
-
-&#x20;               |   MCP Server   |
-
-&#x20;               |   server.py    |
-
-&#x20;               +-------+--------+
-
-&#x20;                       |
-
-&#x20;                       v
-
-&#x20;               +----------------+
-
-&#x20;               | GitHub REST API|
-
-&#x20;               +----------------+
-
+                         User
+                          |
+                          v
+                 +-------------------+
+                 |   Gemini AI Agent  |
+                 |    ai_client.py   |
+                 +---------+---------+
+                           |
+                           v
+                 +-------------------+
+                 |     MCP Client    |
+                 |     client.py     |
+                 +---------+---------+
+                           |
+                     STDIO Transport
+                           |
+                           v
+                 +-------------------+
+                 |     MCP Server    |
+                 |     server.py     |
+                 +---------+---------+
+                           |
+                           v
+                 +-------------------+
+                 |  GitHub REST API  |
+                 +-------------------+
 ```
 
+## Technology Stack
 
+| Technology             | Purpose                         |
+| ---------------------- | ------------------------------- |
+| Python 3.11            | Application development         |
+| Model Context Protocol | Tool communication layer        |
+| MCP Python SDK         | MCP server and client           |
+| GitHub REST API        | GitHub data and operations      |
+| Google Gemini          | AI agent and tool selection     |
+| python-dotenv          | Environment variable management |
+| requests               | HTTP requests to GitHub         |
+| MCP Inspector          | MCP server testing              |
 
-\## MCP Tools
+## MCP Tools
 
+The MCP server currently exposes four tools.
 
+### `list_repositories`
 
-The MCP server currently provides four tools.
+Lists repositories associated with the authenticated GitHub account.
 
+### `list_issues`
 
+Lists issues from a GitHub repository.
 
-\### 1. list\_repositories
-
-
-
-Lists repositories belonging to the authenticated GitHub user.
-
-
-
-\### 2. list\_issues
-
-
-
-Lists issues from a specified GitHub repository.
-
-
-
-Supported states:
-
-
+Supported issue states:
 
 ```text
-
 open
-
 closed
-
 all
-
 ```
 
+Example:
 
+```text
+list_issues(
+    owner="shubham055555",
+    repo="QueryMind",
+    state="open"
+)
+```
 
-\### 3. get\_issue
+### `get_issue`
 
+Retrieves information about a specific issue using the issue number.
 
+Example:
 
-Retrieves details about a specific GitHub issue using its issue number.
+```text
+get_issue(
+    owner="shubham055555",
+    repo="QueryMind",
+    issue_number=1
+)
+```
 
+### `search_issues`
 
-
-\### 4. search\_issues
-
-
-
-Searches repository issues using a search query.
-
-
+Searches issues within a repository using a query.
 
 Example queries:
 
-
-
 ```text
-
 bug
-
 authentication
-
 API
-
 security
-
 database
-
 login
-
 ```
 
-
-
-\## Project Structure
-
-
+## Project Structure
 
 ```text
-
 github-mcp-server/
-
 |
-
-+-- .env
-
 +-- .gitignore
-
 +-- README.md
-
 +-- requirements.txt
-
 |
-
-+-- github\_client.py
-
++-- github_client.py
 +-- server.py
-
 +-- client.py
-
-+-- ai\_client.py
-
++-- ai_client.py
 +-- evaluation.py
-
 |
-
-+-- evaluation\_results/
-
-&#x20;   +-- local\_evaluation\_YYYYMMDD\_HHMMSS.json
-
++-- evaluation_results/
+    +-- local_evaluation_YYYYMMDD_HHMMSS.json
 ```
 
+## File Description
 
+| File               | Description                                                   |
+| ------------------ | ------------------------------------------------------------- |
+| `github_client.py` | GitHub REST API client and authentication                     |
+| `server.py`        | MCP server containing GitHub tools                            |
+| `client.py`        | MCP client for communicating with the server                  |
+| `ai_client.py`     | Gemini-based AI agent                                         |
+| `evaluation.py`    | Deterministic local MCP evaluation                            |
+| `.env`             | Local API credentials                                         |
+| `.gitignore`       | Prevents sensitive and unnecessary files from being committed |
+| `requirements.txt` | Python dependencies                                           |
 
-\## File Description
+## Requirements
 
+Before running the project, install:
 
+* Python 3.11 or later
+* Git
+* GitHub account
+* GitHub Personal Access Token
+* Google Gemini API key
 
-| File               | Purpose                        |
-
-| ------------------ | ------------------------------ |
-
-| `github\_client.py` | GitHub REST API client         |
-
-| `server.py`        | MCP server and GitHub tools    |
-
-| `client.py`        | MCP client                     |
-
-| `ai\_client.py`     | Gemini AI agent                |
-
-| `evaluation.py`    | Local deterministic evaluation |
-
-| `.env`             | API credentials                |
-
-| `requirements.txt` | Python dependencies            |
-
-
-
-\## Requirements
-
-
-
-\* Python 3.11 or higher
-
-\* GitHub account
-
-\* GitHub Personal Access Token
-
-\* Google Gemini API key
-
-\* MCP Python SDK
-
-
-
-\## Installation
-
-
+## Installation
 
 Clone the repository:
 
-
-
 ```bash
-
-git clone <YOUR\_GITHUB\_REPOSITORY\_URL>
-
-cd github-mcp-server
-
+git clone <YOUR_REPOSITORY_URL>
+cd github-mcp-ai-agent
 ```
-
-
 
 Create a virtual environment:
 
-
-
 ```bash
-
 python -m venv .venv
-
 ```
 
-
-
-Activate the virtual environment on Windows:
-
-
+Activate the environment on Windows:
 
 ```cmd
-
-.venv\\Scripts\\activate
-
+.venv\Scripts\activate
 ```
-
-
 
 Install dependencies:
 
-
-
 ```bash
-
 pip install -r requirements.txt
-
 ```
 
-
-
-\## Environment Variables
-
-
+## Configuration
 
 Create a `.env` file in the project root:
 
-
-
 ```env
-
-GITHUB\_TOKEN=your\_github\_token
-
-GEMINI\_API\_KEY=your\_gemini\_api\_key
-
+GITHUB_TOKEN=your_github_token
+GEMINI_API_KEY=your_gemini_api_key
 ```
-
-
 
 Do not commit the `.env` file to GitHub.
 
-
-
-The `.gitignore` file excludes sensitive and generated files such as:
-
-
+The `.gitignore` file excludes:
 
 ```text
-
 .env
-
 .venv/
-
-\_\_pycache\_\_/
-
-evaluation\_results/
-
+__pycache__/
+evaluation_results/
 ```
 
+## Running the MCP Server
 
-
-\## Running the MCP Server
-
-
-
-Check the server syntax:
-
-
+Check the server for syntax errors:
 
 ```cmd
-
-python -m py\_compile server.py
-
+python -m py_compile server.py
 ```
-
-
 
 Run the MCP server:
 
-
-
 ```cmd
-
 python server.py
-
 ```
 
+The MCP server uses STDIO transport for communication with MCP clients.
 
-
-The server communicates through STDIO and can be connected to using an MCP client or MCP Inspector.
-
-
-
-\## Running the MCP Client
-
-
+## Running the MCP Client
 
 Run:
 
-
-
 ```cmd
-
 python client.py
-
 ```
 
+The client starts the MCP server and communicates with it using the MCP protocol.
 
-
-The MCP client connects to the local MCP server using STDIO transport.
-
-
-
-\## Running the AI Agent
-
-
+## Running the AI Agent
 
 Run:
 
-
-
 ```cmd
-
-python ai\_client.py
-
+python ai_client.py
 ```
 
-
-
-Example query:
-
-
+Example user query:
 
 ```text
-
-Show me all open issues in QueryMind
-
+Show me all open issues in QueryMind.
 ```
 
+The AI agent determines the appropriate MCP tool, generates the required arguments, executes the tool through the MCP client, and uses the result to generate the final response.
 
+## Agent Workflow
 
-The AI agent identifies the appropriate MCP tool and executes it through the MCP client and MCP server.
-
-
-
-Example tool selection:
-
-
+For example, when the user asks:
 
 ```text
+Show me all open issues in QueryMind.
+```
 
+The workflow is:
+
+```text
 User Query
-
-&#x20;   |
-
-&#x20;   v
-
-Gemini
-
-&#x20;   |
-
-&#x20;   v
-
-list\_issues
-
-&#x20;   |
-
-&#x20;   v
-
+    |
+    v
+Gemini AI Agent
+    |
+    v
+Tool Selection
+    |
+    v
+list_issues
+    |
+    v
 MCP Client
-
-&#x20;   |
-
-&#x20;   v
-
+    |
+    v
 MCP Server
-
-&#x20;   |
-
-&#x20;   v
-
-GitHub API
-
+    |
+    v
+GitHub REST API
+    |
+    v
+GitHub Response
+    |
+    v
+MCP Client
+    |
+    v
+Gemini AI Agent
+    |
+    v
+Final Response
 ```
 
+## MCP Inspector
 
+The MCP server can also be tested using MCP Inspector.
 
-\## Evaluation
+The available tools can be inspected and executed independently:
 
+```text
+list_repositories
+list_issues
+get_issue
+search_issues
+```
 
+This makes it possible to verify the MCP server before connecting it to the AI agent.
+
+## Evaluation
 
 The project includes a deterministic local evaluation system.
 
-
-
 Run:
 
-
-
 ```cmd
-
-python -m py\_compile evaluation.py
-
+python -m py_compile evaluation.py
 python evaluation.py
-
 ```
 
-
+The evaluation does not use Gemini API calls. This makes the MCP evaluation reproducible and avoids AI API rate limits.
 
 The evaluation checks:
 
+* MCP tool availability
+* Tool execution
+* Expected arguments
+* Repository operations
+* Issue listing
+* Issue searching
+* Individual issue retrieval
+* Multi-step scenarios
 
-
-\* MCP tool availability
-
-\* Tool execution
-
-\* Expected arguments
-
-\* Repository operations
-
-\* Issue listing
-
-\* Issue searching
-
-\* Individual issue retrieval
-
-\* Multi-step scenarios
-
-
-
-\## Evaluation Results
-
-
+## Evaluation Results
 
 The current evaluation contains 20 test cases.
 
-
-
 ```text
-
 Total Tests              : 20
-
 Completed Tests          : 20
-
 Passed Tests             : 20
-
 Failed Tests             : 0
-
 Execution Errors         : 0
 
-
-
 Tool Accuracy            : 100.00%
-
 Argument Accuracy        : 100.00%
-
 Tool Execution Success   : 100.00%
-
 ```
 
+Result:
 
-
+```text
 All 20 tests passed successfully.
-
-
-
-Evaluation results are saved automatically in:
-
-
-
-```text
-
-evaluation\_results/
-
 ```
 
-
-
-\## Example Workflow
-
-
-
-A user asks:
-
-
+Evaluation results are automatically saved in:
 
 ```text
+evaluation_results/
+```
 
+## Testing Strategy
+
+The project separates MCP infrastructure testing from AI model evaluation.
+
+### MCP Evaluation
+
+The deterministic evaluation tests whether the MCP server:
+
+* exposes the expected tools
+* accepts the expected arguments
+* successfully executes GitHub operations
+* returns responses without execution errors
+
+### AI Agent
+
+The Gemini agent is responsible for:
+
+* understanding natural language queries
+* selecting an appropriate MCP tool
+* generating tool arguments
+* executing tools through MCP
+* handling multi-step workflows
+* generating a final natural language response
+
+This separation allows the MCP infrastructure to be tested without depending on Gemini API availability or request quotas.
+
+## Example Queries
+
+The AI agent can handle queries such as:
+
+```text
+Show me all my repositories.
+```
+
+```text
 Show me the open issues in QueryMind.
-
 ```
-
-
-
-The system follows this workflow:
-
-
 
 ```text
-
-User
-
-&#x20;|
-
-&#x20;v
-
-Gemini AI Agent
-
-&#x20;|
-
-&#x20;v
-
-MCP Tool Selection
-
-&#x20;|
-
-&#x20;v
-
-MCP Client
-
-&#x20;|
-
-&#x20;v
-
-MCP Server
-
-&#x20;|
-
-&#x20;v
-
-GitHub REST API
-
-&#x20;|
-
-&#x20;v
-
-GitHub Data
-
-&#x20;|
-
-&#x20;v
-
-MCP Client
-
-&#x20;|
-
-&#x20;v
-
-Gemini AI Agent
-
-&#x20;|
-
-&#x20;v
-
-Final Response
-
+Find bug-related issues in QueryMind.
 ```
 
+```text
+Search for security issues in QueryMind.
+```
 
+```text
+Get issue number 1 from QueryMind.
+```
 
-\## Why MCP?
-
-
+## Why Model Context Protocol?
 
 Model Context Protocol provides a standardized interface between AI applications and external tools and data sources.
 
+In this project, GitHub functionality is exposed as MCP tools.
 
+This architecture provides separation between:
 
-In this project, GitHub functionality is exposed as MCP tools. This allows the AI agent to interact with GitHub through a structured tool interface rather than directly implementing every GitHub operation inside the AI application.
+```text
+AI Layer
+MCP Layer
+GitHub Integration Layer
+```
 
+As a result, the GitHub tools can potentially be reused by different MCP-compatible AI applications.
 
+## Security
 
-This architecture also makes the GitHub tools reusable by different MCP-compatible clients.
+API credentials are stored locally in `.env`.
 
+Sensitive files are excluded from version control using `.gitignore`.
 
+Never commit the following files:
 
-\## Project Goals
+```text
+.env
+```
 
+Never expose GitHub or Gemini API keys in source code, README files, screenshots, or public repositories.
 
-
-This project demonstrates:
-
-
-
-1\. Building an MCP server
-
-2\. Creating MCP tools
-
-3\. Creating an MCP client
-
-4\. Integrating an AI model with MCP
-
-5\. Connecting external APIs through MCP tools
-
-6\. Implementing multi-step agent workflows
-
-7\. Testing MCP tools independently
-
-8\. Building a deterministic evaluation pipeline
-
-
-
-\## Future Improvements
-
-
+## Future Improvements
 
 Possible future improvements include:
 
+* Creating GitHub issues through MCP
+* Updating existing issues
+* Closing issues
+* Creating pull requests
+* Searching repositories
+* Repository activity analysis
+* GitHub Actions CI/CD
+* Advanced AI agent evaluation
+* Persistent conversation memory
+* Web-based user interface
+* Structured logging
+* Error handling and retry mechanisms
+* Support for additional GitHub operations
 
-
-\* Create GitHub issues through MCP
-
-\* Update GitHub issues
-
-\* Close GitHub issues
-
-\* Create pull requests
-
-\* Search repositories
-
-\* Analyze repository activity
-
-\* Add GitHub Actions CI/CD
-
-\* Add more comprehensive agent evaluation
-
-\* Add persistent conversation memory
-
-\* Add a web interface
-
-\* Support multiple GitHub accounts
-
-\* Add structured logging and monitoring
-
-
-
-\## Current Status
-
-
+## Current Status
 
 ```text
-
-GitHub API Integration       Completed
-
-MCP Server                   Completed
-
-MCP Client                   Completed
-
-Gemini AI Agent              Completed
-
-MCP Inspector Testing        Completed
-
-Multi-step Tool Calling      Completed
-
-Local Evaluation             Completed
-
-20/20 Tests Passed           Completed
-
-Documentation               Completed
-
+GitHub REST API Integration     Completed
+MCP Server                      Completed
+MCP Client                      Completed
+Gemini AI Agent                 Completed
+MCP Inspector Testing           Completed
+Multi-step Tool Calling         Completed
+Local Deterministic Evaluation  Completed
+20/20 Tests Passed              Completed
+Project Documentation           Completed
 ```
 
-
-
-\## License
-
-
+## License
 
 This project is intended for learning, experimentation, and open-source development.
-
-
-
